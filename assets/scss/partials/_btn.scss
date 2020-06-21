@@ -1,0 +1,82 @@
+.btn {
+  height: 56px;
+  transition: all 0.3s;
+  padding: 16px 18px;
+  @apply border bg-blue-500 inline-flex rounded text-white justify-center items-center;
+  &:hover {
+    @apply border bg-blue-900;
+  }
+  &--secondary {
+    padding: 16px 22px;
+    @apply border-grey-300 bg-grey-100 text-grey-600;
+    &:hover {
+      border-radius: 99px;
+      @apply border-blue-500 bg-blue-100 text-blue-500;
+    }
+  }
+  &--terciary {
+    height: 42px;
+    padding: 13px 15px;
+    @apply border-blue-300 bg-white text-blue-700 text-sm leading-none;
+    &:hover {
+      @apply border-blue-500 bg-blue-500 text-white;
+    }
+  }
+  &--cancel {
+    border: 1px solid;
+    @apply bg-grey-100 border-grey-300 rounded px-6 text-grey-600;
+    &:hover {
+      @apply bg-grey-300;
+    }
+  }
+  &--back {
+    border: 1px solid;
+    @apply bg-grey-600 border border-grey-600 rounded px-6 text-white;
+    &:hover {
+      @apply bg-grey-900 border border-grey-900;
+    }
+  }
+  &--hero {
+    @apply inline-flex items-center py-3 px-4 bg-blue-900 text-white rounded-large shadow border-none;
+    position: relative;
+    padding-right: 70px;
+    height: 56px;
+    overflow: hidden;
+    span {
+      z-index: 2;
+      position: relative;
+    }
+    &:before {
+      content: '';
+      width: 56px;
+      height: 56px;
+      transition: width 0.3s;
+      z-index: 1;
+      @apply bg-red-500 absolute right-0 rounded-r-large;
+    }
+    &:after {
+      content: '';
+      @apply w-8 h-6 absolute;
+      right: 12px;
+      top: 50%;
+      background: no-repeat url('/img/arrow.svg') center center / contain;
+      transform: translateY(-50%);
+      z-index: 1;
+    }
+    &:hover {
+      &:before {
+        width: 100%;
+      }
+    }
+  }
+  &--small {
+    height: 42px;
+  }
+  &--medium {
+    height: 56px;
+  }
+}
+
+.label {
+  @apply bg-grey-300 rounded px-2 py-1 text-xs text-grey-800;
+}

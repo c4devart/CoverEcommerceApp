@@ -1,0 +1,368 @@
+<template>
+  <BuildAccordion
+    title="Energy Saving Combos"
+    is-open
+    description="Our Energy Saving Combos are crafted to help extend the life of your hot
+      tub cover and save energy. The Chemical Resistant Energy Shield and Full
+      Hinge Seal stops heat from escaping your hot tub while the Vapour Barrier
+      protects it from the water absorption that occurs when chemicals in your
+      hot tub break down the integrity of the foam core."
+  >
+    <div class="flex flex-col flex-1">
+      <template v-if="configYourself">
+        <BuildFormOption
+          :request="re"
+          step="upgrades"
+          label="label"
+          has-info
+          type="vapour-barrier"
+          is-multiple
+          class="flex-1 my-2"
+        />
+        <BuildFormOption
+          :request="re"
+          step="upgrades"
+          label="label"
+          has-info
+          type="chemical-shield"
+          is-multiple
+          class="flex-1 my-2"
+        />
+        <BuildFormOption
+          :request="re"
+          step="upgrades"
+          label="label"
+          has-info
+          is-multiple
+          type="hinge-seal"
+          class="flex-1 my-2"
+        />
+      </template>
+      <template v-else>
+        <p class="text-grey-700 mb-3">
+          Save money by selecting one of our pre-built combos.
+        </p>
+        <div class="en-table flex my-6">
+          <div class="en-table__col table-col en-table__col--header">
+            <div class="table-col__row table-col__row--header"></div>
+            <div class="table-col__row">6mil</div>
+            <div class="table-col__row">8mil</div>
+            <div class="table-col__row">12mil</div>
+            <div class="table-col__row table-col__row--chemical">
+              Chemical Resistant <br />
+              Energy Shield
+            </div>
+            <div class="table-col__row">Full Hinge Seal</div>
+            <div class="table-col__row table-col__row--footer"></div>
+          </div>
+
+          <div
+            v-for="saving in savings"
+            :key="saving.id"
+            :class="{
+              'en-table__col--most-popular': saving.id === 3,
+              ' en-table__col--no-savings': saving.id === 1
+            }"
+            class="en-table__col table-col"
+          >
+            <div class="table-col__row table-col__row--header">
+              <div v-if="saving.id === 3" class="table-col__tooltip">
+                Most Popular
+              </div>
+              <div class="table-select flex flex-col items-center">
+                <FormCheckbox
+                  :value="isComboSelected(saving.id)"
+                  @input="selectCombo(saving)"
+                  style="margin-left: 8px"
+                />
+                <div class="mt-2">{{ saving.label }}</div>
+              </div>
+            </div>
+            <div
+              v-for="(option, i) in saving.options"
+              :key="`o-${i}`"
+              :class="{ 'table-col__row--chemical': i === 3 }"
+              class="table-col__row"
+            >
+              <img
+                v-if="option === 1"
+                src="/img/checkmark.svg"
+                alt="Checkmark"
+              />
+            </div>
+            <div
+              v-if="saving.sale_price"
+              class="table-col__row table-col__row--footer"
+            >
+              <div class="en-table__regular">
+                Reg. {{ format(saving.reg_price) }}
+              </div>
+              <div class="en-table__price">
+                {{ format(saving.sale_price) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+      <a
+        @click.prevent="configYourself = !configYourself"
+        href=""
+        class="text-sm underline text-blue-600 mt-4"
+      >
+        {{ configYourselfLabel }}
+      </a>
+    </div>
+  </BuildAccordion>
+</template>
+
+<script>
+import { currencyFormat } from '@/utils/helpers'
+import BuildAccordion from '@/components/build/BuildAccordion'
+import FormCheckbox from '@/components/form/FormCheckbox'
+import BuildFormOption from '@/components/build/BuildFormOption'
+
+export default {
+  components: {
+    BuildAccordion,
+    FormCheckbox,
+    BuildFormOption
+  },
+  data: () => ({
+    currentCombo: null,
+    configYourself: false,
+    savings: [
+      {
+        id: 1,
+        label: 'No Special Savings',
+        options: [1, 0, 0, 0, 0],
+        reg_price: 0,
+        sale_price: 0
+      },
+      {
+        id: 2,
+        label: 'Combo 1',
+        options: [0, 1, 0, 1, 0],
+        reg_price: 54.9,
+        sale_price: 39.95
+      },
+      {
+        id: 3,
+        label: 'Combo 2',
+        options: [0, 1, 0, 1, 1],
+        reg_price: 84.85,
+        sale_price: 69.95
+      },
+      {
+        id: 4,
+        label: 'Combo 3',
+        options: [0, 0, 1, 1, 0],
+        reg_price: 66.9,
+        sale_price: 49.95
+      },
+      {
+        id: 5,
+        label: 'Combo 4',
+        options: [0, 0, 1, 1, 1],
+        reg_price: 96.85,
+        sale_price: 79.95
+      }
+    ]
+  }),
+  computed: {
+    configYourselfLabel() {
+      return this.configYourself
+        ? 'Pick a combo and save money'
+        : 'Configure your own energy saving options'
+    }
+  },
+  methods: {
+    option(optSlug, id) {
+      const opt = this.$store.getters['builder/retrieveProductOption'](optSlug)
+      console.log('opt', optSlug, id, opt)
+      /*
+        OPTIONS ID
+        ============
+        6mil: 74
+        8mil: 76
+        12mil: 75
+        chemicalShield: 96
+        fullHinge: 100
+      */
+      if (opt) {
+        // eslint-disable-next-line
+        opt.field = opt.fields.find((field) => field.id == id)
+        return opt
+      }
+      return null
+    },
+    re() {},
+    makeCombo(id) {
+      if (id === 1) {
+        this.makeNoSavings()
+      }
+      if (id === 2) {
+        this.makeCombo1()
+      }
+      if (id === 3) {
+        this.makeCombo2()
+      }
+      if (id === 4) {
+        this.makeCombo3()
+      }
+      if (id === 5) {
+        this.makeCombo4()
+      }
+    },
+    unsetCombo(id) {
+      if (id === 1) {
+        this.unsetNoSavings()
+      }
+      if ([2, 4].includes(id)) {
+        this.unsetCombo13()
+      }
+      if ([3, 5].includes(id)) {
+        this.unsetCombo24()
+      }
+    },
+    makeNoSavings() {
+      this.setOptions([this.option('vapour-barrier', 74)])
+    },
+    makeCombo1() {
+      this.setOptions([
+        this.option('vapour-barrier', 76),
+        this.option('chemical-shield', 96)
+      ])
+    },
+    makeCombo2() {
+      this.setOptions([
+        this.option('vapour-barrier', 76),
+        this.option('chemical-shield', 96),
+        this.option('hinge-seal', 100)
+      ])
+    },
+    makeCombo3() {
+      this.setOptions([
+        this.option('vapour-barrier', 75),
+        this.option('chemical-shield', 96)
+      ])
+    },
+    makeCombo4() {
+      this.setOptions([
+        this.option('vapour-barrier', 75),
+        this.option('chemical-shield', 96),
+        this.option('hinge-seal', 100)
+      ])
+    },
+
+    unsetNoSavings() {
+      this.unsetOptions(['vapour-barrier'])
+    },
+    unsetCombo13() {
+      this.unsetOptions(['vapour-barrier', 'chemical-shield'])
+    },
+    unsetCombo24() {
+      this.unsetOptions(['vapour-barrier', 'chemical-shield', 'hinge-seal'])
+    },
+
+    isComboSelected(id) {
+      return this.currentCombo === id
+    },
+    format(price) {
+      return currencyFormat(price)
+    },
+    selectCombo(combo) {
+      this.unsetCombo(this.currentCombo)
+      if (this.currentCombo === combo.id) {
+        this.currentCombo = null
+        return
+      }
+      this.makeCombo(combo.id)
+      this.currentCombo = combo.id
+    },
+
+    setOptions(options, type) {
+      for (const option of options) {
+        this.$store.commit('builder/setOption', {
+          type: option.slug,
+          optionId: option.id,
+          option: option.field,
+          title: option.title
+        })
+      }
+    },
+    unsetOptions(slugs) {
+      for (const slug of slugs) {
+        this.$store.commit('builder/unsetOption', slug)
+      }
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.en-table {
+  &__col {
+    width: 100px;
+    @apply text-center;
+    &--no-savings {
+      @apply bg-grey-100 rounded;
+    }
+    &--most-popular {
+      @apply bg-green-100 border-2 border-green-500 rounded;
+    }
+    .table-col {
+      &__tooltip {
+        @apply absolute bg-green-500 text-white rounded-sm text-xs px-1 h-5 inline-flex items-center justify-center w-20;
+        top: -14px;
+        &:after {
+          top: 100%;
+          left: 50%;
+          border: solid transparent;
+          content: ' ';
+          height: 0;
+          width: 0;
+          position: absolute;
+          pointer-events: none;
+          border-color: rgba(72, 187, 120, 0);
+          border-top-color: #48bb78;
+          border-width: 4px;
+          margin-left: -4px;
+        }
+      }
+      &__row {
+        @apply border-b relative border-blue-200 py-3 flex items-center justify-center;
+        height: 50px;
+        &--header {
+          height: 120px;
+          @apply border-none;
+        }
+        &--header {
+          @apply items-start pt-8;
+        }
+        &--chemical {
+          height: 100px;
+        }
+        &--footer {
+          height: 70px;
+        }
+        &--footer {
+          @apply border-none flex flex-col;
+        }
+      }
+    }
+    &--header {
+      width: 130px;
+      @apply text-grey-700 text-left;
+      .table-col__row {
+        @apply justify-start;
+      }
+    }
+  }
+  &__regular {
+    @apply text-xs;
+  }
+  &__price {
+    @apply font-bold;
+  }
+}
+</style>

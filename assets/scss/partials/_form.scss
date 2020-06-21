@@ -1,0 +1,32 @@
+/*
+ * Form Items
+ */
+ .form-item {
+  input,
+  textarea {
+    @apply border border-grey-300 bg-white rounded w-full outline-none px-4;
+    transition: all 0.3s;
+    &:focus {
+      @apply border-blue-500;
+    }
+    &:disabled {
+      background: #f9fbfe
+    }
+  }
+  input {
+    height: 56px;
+  }
+  textarea {
+    min-height: 120px;
+    @apply py-4;
+  }
+  &.small {
+    margin-top: 1rem !important;
+    input {
+      height: 42px;
+    }
+  }
+  &.no-spacing {
+    margin: 0 !important;
+  }
+}

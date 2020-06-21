@@ -1,0 +1,119 @@
+<template>
+  <div class="video w-full mb-8">
+    <div
+      :class="{ 'video-full--home': isHome }"
+      :style="youtubePreview"
+      class="rounded-md video-full bg-grey-200 flex items-center justify-center"
+    >
+      <a
+        @click.prevent="toggleModal = true"
+        href
+        class="video-full__play opacity-75"
+      >
+        <svg
+          width="63px"
+          height="63px"
+          viewBox="0 0 63 63"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle fill="#E62F46" cx="31.125" cy="31.125" r="31.125" />
+          <path
+            d="M27.8616071,24.9797478 L27.8616071,37.1710513 L36.6974375,31.0753996 L27.8616071,24.9797478 Z M25.9933036,42.5966049 C25.6968661,42.5966049 25.3979375,42.5243638 25.1239196,42.3823728 C24.508625,42.0585335 24.125,41.4233103 24.125,40.7283013 L24.125,21.4224978 C24.125,20.7274888 24.508625,20.0897746 25.1239196,19.7684263 C25.7392143,19.4445871 26.4790625,19.4894263 27.0545,19.8855067 L41.0493393,29.5384085 C41.5550268,29.8846674 41.8564464,30.4601049 41.8564464,31.0753996 C41.8564464,31.6882031 41.5550268,32.2636406 41.0493393,32.6123906 L27.0545,42.2652924 C26.7356429,42.4845067 26.3644732,42.5966049 25.9933036,42.5966049 L25.9933036,42.5966049 Z"
+            fill="#FFFFFF"
+          />
+        </svg>
+      </a>
+    </div>
+    <p
+      v-if="!isDirectUrl && video.title && !isHome"
+      class="flex flex-start text-grey-600 font-semibold mt-2"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        class="mr-2"
+      >
+        <path
+          fill="#00B3EF"
+          fill-rule="evenodd"
+          d="M13 20.146a8.012 8.012 0 0 0 4.132-1.116 7.721 7.721 0 0 0 2.898-2.898A8.012 8.012 0 0 0 21.146 12a8.012 8.012 0 0 0-1.116-4.132 7.721 7.721 0 0 0-2.898-2.898A8.012 8.012 0 0 0 13 3.854 7.976 7.976 0 0 0 8.888 4.97 8.018 8.018 0 0 0 5.97 7.888 7.976 7.976 0 0 0 4.854 12c0 1.475.372 2.846 1.116 4.112a7.867 7.867 0 0 0 2.898 2.918A8.012 8.012 0 0 0 13 20.146zm0-1.605c-1.175 0-2.272-.3-3.29-.901a6.342 6.342 0 0 1-2.35-2.35 6.366 6.366 0 0 1-.9-3.29c0-1.175.3-2.272.9-3.29a6.342 6.342 0 0 1 2.35-2.35c1.018-.6 2.115-.9 3.29-.9 1.175 0 2.272.3 3.29.9a6.342 6.342 0 0 1 2.35 2.35c.6 1.018.9 2.115.9 3.29 0 1.175-.3 2.272-.9 3.29a6.342 6.342 0 0 1-2.35 2.35c-1.018.6-2.115.9-3.29.9zm-1.645-2.879L16.251 12l-4.896-3.682v7.344z"
+        />
+      </svg>
+      <span>
+        {{ video.title }}
+      </span>
+    </p>
+    <transition name="fade">
+      <VideoItemModal
+        :video-id="videoId"
+        v-if="toggleModal"
+        @close="toggleModal = false"
+      />
+    </transition>
+  </div>
+</template>
+
+<script>
+import VideoItemModal from '@/components/video/VideoItemModal'
+
+export default {
+  components: {
+    VideoItemModal
+  },
+  props: {
+    video: {
+      type: [String, Object],
+      required: true
+    },
+    isHome: Boolean,
+    preview: String
+  },
+  data: () => ({
+    toggleModal: false
+  }),
+  computed: {
+    isDirectUrl() {
+      return typeof this.video === 'string'
+    },
+    videoId() {
+      const videoUrl = this.isDirectUrl ? this.video : this.video.video_url
+      const videoSpl = videoUrl.split('v=')
+      const cleanedUp = videoSpl ? videoSpl.reverse()[0].split('&')[0] : null
+      return cleanedUp
+    },
+    youtubePreview() {
+      const videoBckgd =
+        this.preview || `https://img.youtube.com/vi/${this.videoId}/0.jpg`
+      return `background: no-repeat url('${videoBckgd}') center center / cover;`
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.video-full {
+  background: no-repeat url('/img/madeforcanada.png') center center / cover;
+  box-shadow: 0 4px 10px 0 rgba(0, 83, 128, 0.14);
+  height: 240px;
+  max-width: 400px;
+  &--home {
+    @apply rounded-large shadow-none;
+    max-width: inherit;
+    @screen sm {
+      height: 320px;
+    }
+    @screen lg {
+      height: 456px;
+    }
+  }
+
+  &__play {
+    transition: opacity 0.3s;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+</style>
