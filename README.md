@@ -6,4 +6,4 @@ NuxtJS (Vue)
 npm run dev (development mode)
 npm run build (deployment)
 
-![alt text](https://imgur.com/5PrGDUY)
+![alt text](http://45.76.180.140/Screenshot_1.png)
